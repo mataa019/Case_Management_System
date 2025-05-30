@@ -1,11 +1,12 @@
+// filepath: d:\Learning\SpringBoot\CaseManagementSystem\src\main\java\com\example\casemanagementsystem\dto\CaseDto.java
 package com.example.casemanagementsystem.dto;
 
 import com.example.casemanagementsystem.enums.CaseStatus;
 import com.example.casemanagementsystem.enums.CaseType;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,74 +42,66 @@ public class CaseDto {
         private String description;
         private String priority;
         private String creatorId;
+        
+        // Explicit getters as backup
+        public CaseType getCaseType() { return caseType; }
+        public void setCaseType(CaseType caseType) { this.caseType = caseType; }
+        
+        public String getTitle() { return title; }
+        public void setTitle(String title) { this.title = title; }
+        
+        public String getDescription() { return description; }
+        public void setDescription(String description) { this.description = description; }
+        
+        public String getPriority() { return priority; }
+        public void setPriority(String priority) { this.priority = priority; }
+        
+        public String getCreatorId() { return creatorId; }
+        public void setCreatorId(String creatorId) { this.creatorId = creatorId; }
     }
-      @Data
+    
+    @Data
     @NoArgsConstructor
     @AllArgsConstructor
+    @Builder
     public static class AssignCaseRequest {
         private String assigneeId;
         
-        public String getAssigneeId() {
-            return assigneeId;
-        }
-        
-        public void setAssigneeId(String assigneeId) {
-            this.assigneeId = assigneeId;
-        }
+        public String getAssigneeId() { return assigneeId; }
+        public void setAssigneeId(String assigneeId) { this.assigneeId = assigneeId; }
     }
-      @Data
+    
+    @Data
     @NoArgsConstructor
     @AllArgsConstructor
+    @Builder
     public static class UpdateCaseStatusRequest {
         private CaseStatus status;
         private String reason;
         
-        public CaseStatus getStatus() {
-            return status;
-        }
+        public CaseStatus getStatus() { return status; }
+        public void setStatus(CaseStatus status) { this.status = status; }
         
-        public void setStatus(CaseStatus status) {
-            this.status = status;
-        }
-        
-        public String getReason() {
-            return reason;
-        }
-        
-        public void setReason(String reason) {
-            this.reason = reason;
-        }
+        public String getReason() { return reason; }
+        public void setReason(String reason) { this.reason = reason; }
     }
-      @Data
+    
+    @Data
     @NoArgsConstructor
     @AllArgsConstructor
+    @Builder
     public static class UpdateCaseRequest {
         private String title;
         private String description;
         private String priority;
         
-        public String getTitle() {
-            return title;
-        }
+        public String getTitle() { return title; }
+        public void setTitle(String title) { this.title = title; }
         
-        public void setTitle(String title) {
-            this.title = title;
-        }
+        public String getDescription() { return description; }
+        public void setDescription(String description) { this.description = description; }
         
-        public String getDescription() {
-            return description;
-        }
-        
-        public void setDescription(String description) {
-            this.description = description;
-        }
-        
-        public String getPriority() {
-            return priority;
-        }
-        
-        public void setPriority(String priority) {
-            this.priority = priority;
-        }
+        public String getPriority() { return priority; }
+        public void setPriority(String priority) { this.priority = priority; }
     }
 }
