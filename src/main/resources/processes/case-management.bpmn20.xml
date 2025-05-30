@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://flowable.org/bpmn">
+
+    <process id="caseLifecycle" name="Case Lifecycle Process" isExecutable="true">
+
+        <startEvent id="startEvent" name="Case Created"/>
+
+        <serviceTask id="initializeCase" name="Initialize Case" 
+                     flowable:class="com.example.casemanagementsystem.service.FlowableWorkflowService"/>
+
+        <userTask id="reviewCase" name="Review Case" 
+                  flowable:assignee="${assigneeId}" 
+                  flowable:candidateGroups="Investigations"/>
+
+        <exclusiveGateway id="reviewDecision" name="Review Decision"/>
+
+        <userTask id="investigateCase" name="Investigate Case"
+                  flowable:candidateGroups="Investigations"/>
+
+        <userTask id="suspendedState" name="Case Suspended"
+                  flowable:assignee="${assigneeId}"/>
+
+        <serviceTask id="closeCase" name="Close Case"
+                     flowable:class="com.example.casemanagementsystem.service.FlowableWorkflowService"/>
+
+        <endEvent id="endEvent" name="Case Completed"/>
+
+        <!-- Sequence flows -->
+        <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="initializeCase"/>
+        <sequenceFlow id="flow2" sourceRef="initializeCase" targetRef="reviewCase"/>
+        <sequenceFlow id="flow3" sourceRef="reviewCase" targetRef="reviewDecision"/>
+
+        <sequenceFlow id="flow4" sourceRef="reviewDecision" targetRef="investigateCase">
+            <conditionExpression xsi:type="tFormalExpression">${action == 'INVESTIGATE'}</conditionExpression>
+        </sequenceFlow>
+
+        <sequenceFlow id="flow5" sourceRef="reviewDecision" targetRef="suspendedState">
+            <conditionExpression xsi:type="tFormalExpression">${action == 'SUSPEND'}</conditionExpression>
+        </sequenceFlow>
+
+        <sequenceFlow id="flow6" sourceRef="reviewDecision" targetRef="closeCase">
+            <conditionExpression xsi:type="tFormalExpression">${action == 'CLOSE'}</conditionExpression>
+        </sequenceFlow>
+
+        <sequenceFlow id="flow7" sourceRef="investigateCase" targetRef="reviewDecision"/>
+        <sequenceFlow id="flow8" sourceRef="suspendedState" targetRef="reviewCase"/>
+        <sequenceFlow id="flow9" sourceRef="closeCase" targetRef="endEvent"/>
+
+    </process>
+
+</definitions>

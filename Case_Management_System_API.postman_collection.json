@@ -1,0 +1,700 @@
+{
+  "info": {
+    "name": "Case Management System API",
+    "description": "Complete API collection for testing the Case Management System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/cms",
+      "type": "string"
+    },
+    {
+      "key": "caseId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "taskId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "testuser001",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Case Management",
+      "item": [
+        {
+          "name": "1. Create Case - Fraud",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('caseId', response.caseId);",
+                  "    console.log('Case created with ID: ' + response.caseId);",
+                  "}",
+                  "",
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Case has correct type', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.caseType).to.eql('FRAUD');",
+                  "});",
+                  "",
+                  "pm.test('Case has DRAFT status', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.status).to.eql('DRAFT');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"caseType\": \"FRAUD\",\n  \"title\": \"Suspicious Payment Investigation\",\n  \"description\": \"Customer reported unauthorized transactions on their account. Multiple high-value transactions detected outside normal spending pattern.\",\n  \"priority\": \"HIGH\",\n  \"creatorId\": \"investigator001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cases",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cases"]
+            }
+          }
+        },
+        {
+          "name": "2. Get Case Details",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response has case details', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('caseId');",
+                  "    pm.expect(response).to.have.property('title');",
+                  "    pm.expect(response).to.have.property('status');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cases/{{caseId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cases", "{{caseId}}"]
+            }
+          }
+        },
+        {
+          "name": "3. Assign Case to User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Case status changed to READY', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.status).to.eql('READY');",
+                  "});",
+                  "",
+                  "pm.test('Case has assignee', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.assigneeId).to.eql('investigator002');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "{{userId}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"assigneeId\": \"investigator002\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cases/{{caseId}}/assign",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cases", "{{caseId}}", "assign"]
+            }
+          }
+        },
+        {
+          "name": "4. Suspend Case",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Case status changed to SUSPENDED', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.status).to.eql('SUSPENDED');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "{{userId}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"SUSPENDED\",\n  \"reason\": \"Waiting for additional documentation from customer\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cases/{{caseId}}/suspend",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cases", "{{caseId}}", "suspend"]
+            }
+          }
+        },
+        {
+          "name": "5. Resume Case",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Case status changed to READY', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.status).to.eql('READY');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "{{userId}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"READY\",\n  \"reason\": \"Customer provided required documentation\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cases/{{caseId}}/resume",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cases", "{{caseId}}", "resume"]
+            }
+          }
+        },
+        {
+          "name": "6. List Active Cases",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cases?activeOnly=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cases"],
+              "query": [
+                {
+                  "key": "activeOnly",
+                  "value": "true"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "7. Close Case",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "{{userId}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"CLOSED\",\n  \"reason\": \"Investigation completed - no fraud detected. All transactions verified as legitimate.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cases/{{caseId}}/close",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cases", "{{caseId}}", "close"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Task Management",
+      "item": [
+        {
+          "name": "1. Create Task",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('taskId', response.taskId);",
+                  "    console.log('Task created with ID: ' + response.taskId);",
+                  "}",
+                  "",
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Task has UNASSIGNED status', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.status).to.eql('UNASSIGNED');",
+                  "});"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Note: Make sure to run the case creation first to get a valid caseId",
+                  "// Or manually set a caseId from an existing case"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"taskName\": \"Review Transaction History\",\n  \"description\": \"Analyze the last 30 days of transaction history for unusual patterns and anomalies\",\n  \"groupName\": \"Investigations\",\n  \"caseId\": 1,\n  \"dueDate\": \"2025-06-15T17:00:00\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks"]
+            }
+          }
+        },
+        {
+          "name": "2. Get Task Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "{{taskId}}"]
+            }
+          }
+        },
+        {
+          "name": "3. Assign Task to User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Task status changed to ASSIGNED', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.status).to.eql('ASSIGNED');",
+                  "});",
+                  "",
+                  "pm.test('Task has assignee', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.assigneeId).to.eql('investigator002');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "{{userId}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"assigneeId\": \"investigator002\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}/assign",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "{{taskId}}", "assign"]
+            }
+          }
+        },
+        {
+          "name": "4. Update Task Status to IN_PROGRESS",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "investigator002"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"IN_PROGRESS\",\n  \"reason\": \"Started reviewing transaction logs and patterns\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "{{taskId}}", "status"]
+            }
+          }
+        },
+        {
+          "name": "5. Complete Task",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "investigator002"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"COMPLETED\",\n  \"reason\": \"Transaction review completed. No suspicious activity found in the reviewed period.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "{{taskId}}", "status"]
+            }
+          }
+        },
+        {
+          "name": "6. Unassign Task",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "X-User-Id",
+                "value": "{{userId}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks/{{taskId}}/unassign",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks", "{{taskId}}", "unassign"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Queue Management",
+      "item": [
+        {
+          "name": "1. Get Investigations Queue",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response is an array', function () {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/queues/investigations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "queues", "investigations"]
+            }
+          }
+        },
+        {
+          "name": "2. Get Group Queue",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/queues/Investigations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "queues", "Investigations"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Additional Test Cases",
+      "item": [
+        {
+          "name": "Create Dispute Case",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"caseType\": \"DISPUTE\",\n  \"title\": \"Customer Payment Dispute\",\n  \"description\": \"Customer disputes charge for service not received\",\n  \"priority\": \"MEDIUM\",\n  \"creatorId\": \"support001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cases",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cases"]
+            }
+          }
+        },
+        {
+          "name": "Get Cases by Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cases?status=READY",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cases"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "READY"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Cases by Type",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cases?caseType=FRAUD",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cases"],
+              "query": [
+                {
+                  "key": "caseType",
+                  "value": "FRAUD"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Tasks by Assignee",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/tasks?assigneeId=investigator002",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "tasks"],
+              "query": [
+                {
+                  "key": "assigneeId",
+                  "value": "investigator002"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Error Testing",
+      "item": [
+        {
+          "name": "Invalid Case Status Transition",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400 or 500', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([400, 500]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-User-Id",
+                "value": "{{userId}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"SUSPENDED\",\n  \"reason\": \"This should fail for a DRAFT case\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cases/CASE-SAMPLE01/suspend",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cases", "CASE-SAMPLE01", "suspend"]
+            }
+          }
+        },
+        {
+          "name": "Case Not Found",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404 or 500', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([404, 500]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/cases/NONEXISTENT-CASE",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cases", "NONEXISTENT-CASE"]
+            }
+          }
+        },
+        {
+          "name": "Missing Required Header",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"assigneeId\": \"investigator002\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cases/{{caseId}}/assign",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cases", "{{caseId}}", "assign"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

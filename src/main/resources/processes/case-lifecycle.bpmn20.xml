@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://flowable.org/bpmn">
+
+    <process id="caseLifecycle" name="Case Lifecycle Process" isExecutable="true">
+
+        <startEvent id="startEvent" name="Start Case"/>
+        <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="draftTask"/>
+
+        <userTask id="draftTask" name="Draft Case" flowable:assignee="${creatorId}"/>
+        <sequenceFlow id="flow2" sourceRef="draftTask" targetRef="readyTask"/>
+
+        <userTask id="readyTask" name="Ready for Review" flowable:candidateGroups="investigations"/>
+        <sequenceFlow id="flow3" sourceRef="readyTask" targetRef="suspendGateway"/>
+
+        <exclusiveGateway id="suspendGateway" name="Suspend or Close?"/>
+
+        <sequenceFlow id="toSuspend" sourceRef="suspendGateway" targetRef="suspendedTask">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${status == 'SUSPENDED'}]]></conditionExpression>
+        </sequenceFlow>
+
+        <sequenceFlow id="toClose" sourceRef="suspendGateway" targetRef="closeTask">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${status == 'CLOSED'}]]></conditionExpression>
+        </sequenceFlow>
+
+        <userTask id="suspendedTask" name="Suspended Case" flowable:candidateGroups="investigations"/>
+        <sequenceFlow id="resumeFlow" sourceRef="suspendedTask" targetRef="readyTask"/>
+
+        <userTask id="closeTask" name="Close Case" flowable:assignee="${creatorId}"/>
+        <sequenceFlow id="flowEnd" sourceRef="closeTask" targetRef="endEvent"/>
+
+        <endEvent id="endEvent" name="Case Closed"/>
+
+    </process>
+
+</definitions>
