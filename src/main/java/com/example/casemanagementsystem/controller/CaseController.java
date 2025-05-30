@@ -2,7 +2,6 @@ package com.example.casemanagementsystem.controller;
 
 import java.util.List;
 
-import lombok.NoArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,15 +18,16 @@ import com.example.casemanagementsystem.enums.CaseStatus;
 import com.example.casemanagementsystem.enums.CaseType;
 import com.example.casemanagementsystem.service.CaseService;
 
-import lombok.RequiredArgsConstructor;
-
 @RestController
 @RequestMapping("/api/cases")
-@RequiredArgsConstructor
-@NoArgsConstructor
 public class CaseController {
 
-    private  CaseService caseService;
+    private final CaseService caseService;
+
+    // Constructor injection
+    public CaseController(CaseService caseService) {
+        this.caseService = caseService;
+    }
 
     @PostMapping
     public ResponseEntity<CaseDto> createCase(@RequestBody CaseDto.CreateCaseRequest request) {
@@ -75,6 +75,15 @@ public class CaseController {
             @RequestHeader("X-User-Id") String userId) {
         CaseDto closedCase = caseService.closeCase(caseId, userId, request.getReason());
         return ResponseEntity.ok(closedCase);
+    }
+
+    @PutMapping("/{caseId}")
+    public ResponseEntity<CaseDto> updateCase(
+            @PathVariable String caseId,
+            @RequestBody CaseDto.UpdateCaseRequest request,
+            @RequestHeader("X-User-Id") String userId) {
+        CaseDto updatedCase = caseService.updateCase(caseId, request, userId);
+        return ResponseEntity.ok(updatedCase);
     }
 
     @GetMapping

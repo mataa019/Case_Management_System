@@ -134,6 +134,32 @@ public class CaseService {
         return convertToDto(savedCase);
     }
 
+    public CaseDto updateCase(String caseId, CaseDto.UpdateCaseRequest request, String userId) {
+        CaseEntity caseEntity = findCaseByCaseId(caseId);
+        
+        // Update the case fields
+        if (request.getTitle() != null && !request.getTitle().trim().isEmpty()) {
+            caseEntity.setTitle(request.getTitle());
+        }
+        
+        if (request.getDescription() != null) {
+            caseEntity.setDescription(request.getDescription());
+        }
+        
+        if (request.getPriority() != null && !request.getPriority().trim().isEmpty()) {
+            caseEntity.setPriority(request.getPriority());
+        }
+        
+        // Save the updated case
+        CaseEntity updatedCase = caseRepository.save(caseEntity);
+        
+        // Log the action
+        loggingService.logAction(userId, ActionType.CASE_UPDATED, "CASE", 
+                caseEntity.getCaseId(), "Case updated: " + caseEntity.getTitle());
+        
+        return convertToDto(updatedCase);
+    }
+
     public CaseDto getCase(String caseId) {
         CaseEntity caseEntity = findCaseByCaseId(caseId);
         return convertToDto(caseEntity);
@@ -189,7 +215,9 @@ public class CaseService {
                 .createdAt(caseEntity.getCreatedAt())
                 .updatedAt(caseEntity.getUpdatedAt())
                 .build();
-    }    private String generateCaseId() {
+    }
+
+    private String generateCaseId() {
         return "CASE-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
 }
