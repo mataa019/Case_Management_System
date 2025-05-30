@@ -2,6 +2,7 @@ package com.example.casemanagementsystem.controller;
 
 import java.util.List;
 
+import lombok.NoArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,9 +24,10 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/cases")
 @RequiredArgsConstructor
+@NoArgsConstructor
 public class CaseController {
 
-    private final CaseService caseService;
+    private  CaseService caseService;
 
     @PostMapping
     public ResponseEntity<CaseDto> createCase(@RequestBody CaseDto.CreateCaseRequest request) {

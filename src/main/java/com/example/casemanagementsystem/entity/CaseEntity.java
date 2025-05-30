@@ -87,4 +87,40 @@ public class CaseEntity {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
+    // Manual getters and setters as backup (Lombok should override these)
+    public String getCaseId() { return caseId; }
+    public void setCaseId(String caseId) { this.caseId = caseId; }
+    
+    public CaseType getCaseType() { return caseType; }
+    public void setCaseType(CaseType caseType) { this.caseType = caseType; }
+    
+    public CaseStatus getStatus() { return status; }
+    public void setStatus(CaseStatus status) { this.status = status; }
+    
+    public String getCreatorId() { return creatorId; }
+    public void setCreatorId(String creatorId) { this.creatorId = creatorId; }
+    
+    public String getAssigneeId() { return assigneeId; }
+    public void setAssigneeId(String assigneeId) { this.assigneeId = assigneeId; }
+    
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+    
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    
+    public String getPriority() { return priority; }
+    public void setPriority(String priority) { this.priority = priority; }
+    
+    public String getFlowableProcessInstanceId() { return flowableProcessInstanceId; }
+    public void setFlowableProcessInstanceId(String flowableProcessInstanceId) { 
+        this.flowableProcessInstanceId = flowableProcessInstanceId; 
+    }
+    
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }
